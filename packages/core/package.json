@@ -1,0 +1,16 @@
+{
+  "name": "@boil/core",
+  "version": "1.0.0",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "license": "MIT",
+
+  "scripts": {
+    "test": "mocha",
+    "build": "tsc"
+  },
+
+  "devDependencies": {
+    "earljs": "^0.2.2"
+  }
+}

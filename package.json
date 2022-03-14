@@ -1,0 +1,25 @@
+{
+  "name": "boil",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "test": "wsrun -ecsm test",
+    "build": "wsrun -ecsm build"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.0",
+    "earljs": "^0.2.2",
+    "esbuild": "^0.14.26",
+    "esbuild-register": "^3.3.2",
+    "mocha": "^9.2.2",
+    "typescript": "^4.6.2",
+    "wsrun": "^5.2.4"
+  }
+}
