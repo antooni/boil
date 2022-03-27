@@ -1,17 +1,20 @@
 import { Input } from "../model/Input";
 import { Node } from "../model/Node";
 
-interface Boundary {
+export interface Boundary {
   from: number;
   to: number;
 }
 
 export class CPM {
+  add(a:number, b:number) {
+    return a+b
+  }
   //TODO function to get final index
   buildGraph(
     activities: Input[],
     finalIndex: number
-  ): Map<string, { from: number; to: number }> {
+  ): Map<string, Boundary> {
     const graph = new Map();
 
     let lastIndex = 1;
