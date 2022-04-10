@@ -94,6 +94,15 @@ const GRAPH = new Map([
   ["N", { from: 8, to: 9 , duration:9}],
 ]);
 
+
+describe(CPM.prototype.solve.name, () => {
+  it("works", () => {
+    const result = cpm.solve(ACTIVITIES)
+
+    
+  })
+})
+
 describe(CPM.prototype.convertToNodes.name, () => {
   it("works", () => {
     const result = cpm.convertToNodes(GRAPH);
@@ -149,8 +158,8 @@ describe(CPM.prototype.convertToNodes.name, () => {
 });
 
 describe(CPM.prototype.buildGraph.name, () => {
-  it("ABCD", () => {
-    expect(cpm.buildGraph(ACTIVITIES, 9)).toEqual(GRAPH);
+  it("whole", () => {
+    expect(cpm.buildGraph(ACTIVITIES)).toEqual(GRAPH);
   });
 });
 
@@ -170,18 +179,44 @@ describe(CPM.prototype.findFrom.name, () => {
 
 describe(CPM.prototype.findTo.name, () => {
   it("A", () => {
-    expect(cpm.findTo(ACTIVITIES[0], ACTIVITIES, GRAPH, 1, 9)).toEqual(2);
-  });
-
-  it("E", () => {
-    expect(cpm.findTo(ACTIVITIES[4], ACTIVITIES, GRAPH, 4, 9)).toEqual(5);
+    const graph = new Map();
+    expect(cpm.findTo(ACTIVITIES[0], ACTIVITIES, graph, 1)).toEqual(2);
   });
 
   it("D", () => {
-    expect(cpm.findTo(ACTIVITIES[3], ACTIVITIES, GRAPH, 4, 9)).toEqual(4);
+    const graph = new Map([
+      ["A", { from: 1, to: 2, duration: 3 }],
+      ["B", { from: 1, to: 3, duration: 4 }],
+      ["C", { from: 1, to: 4, duration: 6 }],
+    ]);
+    expect(cpm.findTo(ACTIVITIES[3], ACTIVITIES, graph, 3)).toEqual(4);
+  });
+
+  it("E", () => {
+    const graph = new Map([
+      ["A", { from: 1, to: 2, duration: 3 }],
+      ["B", { from: 1, to: 3, duration: 4 }],
+      ["C", { from: 1, to: 4, duration: 6 }],
+      ["D", { from: 3, to: 4 , duration:3}],
+    ]);
+    expect(cpm.findTo(ACTIVITIES[4], ACTIVITIES, graph, 4)).toEqual(5);
   });
 
   it("M", () => {
-    expect(cpm.findTo(ACTIVITIES[12], ACTIVITIES, GRAPH, 9, 9)).toEqual(9);
+    const graph = new Map([
+      ["A", { from: 1, to: 2, duration: 3 }],
+      ["B", { from: 1, to: 3, duration: 4 }],
+      ["C", { from: 1, to: 4, duration: 6 }],
+      ["D", { from: 3, to: 4 , duration:3}],
+      ["E", { from: 2, to: 5, duration:9 }],
+      ["F", { from: 2, to: 6 , duration: 1}],
+      ["G", { from: 3, to: 6, duration:4 }],
+      ["H", { from: 4, to: 6 , duration:5}],
+      ["I", { from: 4, to: 7 , duration:4}],
+      ["J", { from: 5, to: 8 , duration:3}],
+      ["K", { from: 6, to: 8 , duration:6}],
+      ["L", { from: 6, to: 9 , duration:3}],
+    ]);
+    expect(cpm.findTo(ACTIVITIES[12], ACTIVITIES, graph, 9)).toEqual(9);
   });
 });

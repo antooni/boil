@@ -1,14 +1,15 @@
+import { Output } from "../model";
 import { Input } from "../model/Input";
 import { Node } from "../model/Node";
 
 export interface Boundary {
   from: number;
   to: number;
-  duration: number
+  duration: number;
 }
 
 export class CPM {
-  solve(graph: Map<string, Boundary>) {}
+  solve(input: Input[]): Output[] {}
 
   convertToNodes(graph: Map<string, Boundary>): Node[] {
     const mapping = new Map<number, Node>();
@@ -19,7 +20,11 @@ export class CPM {
         previous: [],
         next: [],
       };
-      node.next.push({ num: value.to, activity: key, duration: value.duration });
+      node.next.push({
+        num: value.to,
+        activity: key,
+        duration: value.duration,
+      });
       mapping.set(value.from, node);
     }
 
@@ -29,7 +34,11 @@ export class CPM {
         previous: [],
         next: [],
       };
-      node.previous.push({ num: value.from, activity: key, duration: value.duration });
+      node.previous.push({
+        num: value.from,
+        activity: key,
+        duration: value.duration,
+      });
       mapping.set(value.to, node);
     }
     const arr = Array.from(mapping.values());
@@ -38,23 +47,21 @@ export class CPM {
   }
 
   //TODO function to get final index
-  buildGraph(activities: Input[], finalIndex: number): Map<string, Boundary> {
+  buildGraph(activities: Input[]): Map<string, Boundary> {
     const graph = new Map();
 
     let lastIndex = 1;
 
     for (const activity of activities) {
       const from = this.findFrom(activity, graph);
-      const to = this.findTo(
-        activity,
-        activities,
-        graph,
-        lastIndex,
-        finalIndex
-      );
+      const to = this.findTo(activity, activities, graph, lastIndex);
       if (to > lastIndex) lastIndex++;
 
-      graph.set(`${activity.activity}`, { from, to, duration: activity.duration });
+      graph.set(`${activity.activity}`, {
+        from,
+        to,
+        duration: activity.duration,
+      });
     }
 
     return graph;
@@ -73,16 +80,17 @@ export class CPM {
     activity: Input,
     activities: Input[],
     graph: Map<string, Boundary>,
-    lastIndex: number,
-    finalIndex: number
+    lastIndex: number
   ): number {
-    if (lastIndex >= finalIndex) {
-      return finalIndex;
-    }
     if (activity.previous.length === 0) {
       return ++lastIndex;
     } else {
       const index = activities.indexOf(activity);
+
+      if (isLast(index, activities, graph)) {
+        return lastIndex;
+      }
+
       const known = activities
         .slice(index)
         .find((a) => a.previous.includes(activity.activity));
@@ -95,4 +103,26 @@ export class CPM {
       }
     }
   }
+}
+
+function isLast(
+  index: number,
+  activities: Input[],
+  graph: Map<string, Boundary>
+): boolean {
+
+  let lastActivity = "";
+  for (const [key, value] of graph.entries()) {
+    lastActivity = key;
+  }
+
+  const isPredecessorForAnyNextActivity = activities
+    .slice(index)
+    .find((a) => a.previous.includes(lastActivity));
+
+  if (isPredecessorForAnyNextActivity === undefined) {
+    return true;
+  }
+
+  return false;
 }
