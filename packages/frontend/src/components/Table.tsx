@@ -1,7 +1,7 @@
 import { Boundary } from "@boil/core";
 import { Component, For } from "solid-js";
 
-export const Graph: Component<{ operations: Map<string, Boundary> }> = (
+export const Graph: Component<{ output: Map<string, Boundary> }> = (
   props
 ) => {
   const array = Array.from(props.operations, ([name, value]) => ({

@@ -4,17 +4,41 @@ import { Node } from "../model/Node";
 export interface Boundary {
   from: number;
   to: number;
+  duration: number
 }
 
 export class CPM {
-  add(a:number, b:number) {
-    return a+b
+  solve(graph: Map<string, Boundary>) {}
+
+  convertToNodes(graph: Map<string, Boundary>): Node[] {
+    const mapping = new Map<number, Node>();
+
+    for (const [key, value] of graph.entries()) {
+      const node = mapping.get(value.from) ?? {
+        num: value.from,
+        previous: [],
+        next: [],
+      };
+      node.next.push({ num: value.to, activity: key, duration: value.duration });
+      mapping.set(value.from, node);
+    }
+
+    for (const [key, value] of graph.entries()) {
+      const node = mapping.get(value.to) ?? {
+        num: value.to,
+        previous: [],
+        next: [],
+      };
+      node.previous.push({ num: value.from, activity: key, duration: value.duration });
+      mapping.set(value.to, node);
+    }
+    const arr = Array.from(mapping.values());
+
+    return arr.sort((a, b) => a.num - b.num);
   }
+
   //TODO function to get final index
-  buildGraph(
-    activities: Input[],
-    finalIndex: number
-  ): Map<string, Boundary> {
+  buildGraph(activities: Input[], finalIndex: number): Map<string, Boundary> {
     const graph = new Map();
 
     let lastIndex = 1;
@@ -30,7 +54,7 @@ export class CPM {
       );
       if (to > lastIndex) lastIndex++;
 
-      graph.set(`${activity.activity}`, { from, to });
+      graph.set(`${activity.activity}`, { from, to, duration: activity.duration });
     }
 
     return graph;
