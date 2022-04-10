@@ -1,23 +1,17 @@
-import { Graph } from "./components/Table";
+import { OutputComponent } from "./components/Output";
 
 import { CPM } from "../../core/src/services/CPM";
-import { Input } from "./components/Input";
+import { InputComponent } from "./components/Input";
 import { createSignal } from "solid-js";
-
-export type Activity = {
-  activity: string;
-  previous: string[];
-  duration: number;
-};
 
 function App() {
   const [input, setInput] = createSignal([]);
-  const [output, setOutput] = createSignal({})
+  const [output, setOutput] = createSignal([])
 
   const calculateOutput = () => {
     const cpm = new CPM()
     
-    const output = cpm.buildGraph(input(),9)
+    const output = cpm.solve(input())
 
     setOutput(output)
   }
@@ -25,11 +19,12 @@ function App() {
   return (
     <>
       <div class="p-4 align-middle text-center ">
-        <button class="rounded-full bg-sky-500/75 p-2">OBLICZ</button>
+        <button class="rounded-full bg-sky-500/75 p-2" onClick={calculateOutput}>OBLICZ</button>
       </div>
-      <div class="p-8 columns-2">
-        <Input setActivities={setInput} activities={input()}></Input>
-        <Graph output={output()}></Graph>
+      <div class="p-8 flex flex-row">
+        <InputComponent  setActivities={setInput} activities={input}></InputComponent>
+        <OutputComponent output={output()}></OutputComponent>
+       
       </div>
     </>
   );
