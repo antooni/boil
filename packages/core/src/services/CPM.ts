@@ -9,7 +9,63 @@ export interface Boundary {
 }
 
 export class CPM {
-  solve(input: Input[]): Output[] {}
+  solve(input: Input[]): Output[] {
+    const graph = this.buildGraph(input);
+
+    const nodes = this.convertToNodes(graph);
+
+    const output = new Map<string, Output>();
+
+    let T = 0;
+
+    for (const node of nodes) {
+      for (const next of node.next) {
+        const tmp = initOutput(next.activity);
+        if (node.previous.length === 0) {
+          tmp.ES = 0;
+          tmp.EF = next.duration;
+          tmp.duration = next.duration;
+        } else {
+          let latestTime = 0;
+          for (const prev of node.previous) {
+            const o = output.get(prev.activity);
+            if (o!.EF > latestTime) {
+              latestTime = o!.EF;
+            }
+          }
+          tmp.ES = latestTime;
+          tmp.EF = latestTime + next.duration;
+          tmp.duration = next.duration;
+        }
+        if (tmp.EF > T) {
+          T = tmp.EF;
+        }
+        output.set(next.activity, tmp);
+      }
+    }
+
+    for (let i = nodes.length - 1; i > 0; i--) {
+      for (const prev of nodes[i].previous) {
+        const tmp = output.get(prev.activity);
+        if (nodes[i].next.length === 0) {
+          tmp!.LF = T;
+          tmp!.LS = T - prev.duration;
+        } else {
+          const next = nodes[i].next[0].activity;
+          const o = output.get(next);
+          tmp!.LF = o!.LS;
+          tmp!.LS = o!.LS - tmp!.duration;
+        }
+        output.set(prev.activity, tmp!);
+      }
+    }
+
+    return Array.from(output, ([key, value]) => ({
+      ...value,
+      reserve: value.LS - value.ES,
+      isCritical: value.LS - value.ES === 0,
+    }));
+  }
 
   convertToNodes(graph: Map<string, Boundary>): Node[] {
     const mapping = new Map<number, Node>();
@@ -110,7 +166,6 @@ function isLast(
   activities: Input[],
   graph: Map<string, Boundary>
 ): boolean {
-
   let lastActivity = "";
   for (const [key, value] of graph.entries()) {
     lastActivity = key;
@@ -125,4 +180,17 @@ function isLast(
   }
 
   return false;
+}
+
+function initOutput(activity: string) {
+  return {
+    activity,
+    duration: -1,
+    ES: -1,
+    EF: -1,
+    LS: -1,
+    LF: -1,
+    reserve: -1,
+    isCritical: false,
+  };
 }

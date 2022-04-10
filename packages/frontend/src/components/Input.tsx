@@ -7,16 +7,27 @@ export const InputComponent: Component<{
   const  handleClick = () => {
     const operation = document.getElementById("operation")?.value;
     const duration = document.getElementById("duration")?.value;
+    //it needs to be sorted !!!
     const neighbors = document.getElementById("neighbors")?.value;
 
     props.setActivities((prev: any[]) => [
       ...prev,
       {
         activity: operation,
-        previous: neighbors.split(","),
-        duration: duration,
+        previous: neighbors.split(",").sort((a,b) => a.localeCompare(b)),
+        duration: +duration,
       },
     ]);
+
+    (document.getElementById("operation") as HTMLInputElement).value = '';
+    (document.getElementById("duration") as HTMLInputElement).value = '';
+    (document.getElementById("neighbors") as HTMLInputElement).value = '';
+  }
+
+  const handleDelete = (activity: string) => {
+    const filtered = props.activities().filter(a => a.activity !== activity)
+
+    props.setActivities(filtered)
   }
 
   return (
@@ -51,6 +62,7 @@ export const InputComponent: Component<{
               <td>Operacja</td>
               <td>Długość</td>
               <td>Poprzednicy</td>
+              <td></td>
             </tr>
           </thead>
           <tbody>
@@ -60,6 +72,7 @@ export const InputComponent: Component<{
                   <td>{activity.activity}</td>
                   <td>{activity.duration}</td>
                   <td>{activity.previous.join(",")}</td>
+                  <td><button class="text-red-700" onClick={() => handleDelete(activity.activity)}>X</button></td>
                 </tr>
               )}
             </For>

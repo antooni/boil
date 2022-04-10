@@ -5,15 +5,56 @@ import { InputComponent } from "./components/Input";
 import { createSignal } from "solid-js";
 
 function App() {
-  const [input, setInput] = createSignal([]);
+  const [input, setInput] = createSignal([
+    {
+      activity: "A",
+      previous: [],
+      duration: 5,
+    },
+    {
+      activity: "B",
+      previous: [],
+      duration: 7,
+    },
+    {
+      activity: "C",
+      previous: ["A"],
+      duration: 6,
+    },
+    {
+      activity: "D",
+      previous: ["A"],
+      duration: 8,
+    },
+    {
+      activity: "E",
+      previous: ["B"],
+      duration: 3,
+    },
+    {
+      activity: "F",
+      previous: ["C"],
+      duration: 4,
+    },
+    {
+      activity: "G",
+      previous: ["C"],
+      duration: 2,
+    },
+    {
+      activity: "H",
+      previous: ["D", "E", "F"],
+      duration: 5,
+    },
+  ]);
   const [output, setOutput] = createSignal([])
 
   const calculateOutput = () => {
     const cpm = new CPM()
     
-    const output = cpm.solve(input())
+    const result = cpm.solve(input())
 
-    setOutput(output)
+    setOutput(result)
   }
 
   return (

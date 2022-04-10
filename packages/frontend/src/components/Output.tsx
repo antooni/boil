@@ -4,7 +4,7 @@ import { Component, For } from "solid-js";
 export const OutputComponent: Component<{ output: Output[] }> = (props) => {
   return (
     <div class="basis-1/2"> 
-      <table class="table-auto">
+      <table class="table-fixed">
         <thead>
           <tr>
             <th>Activity</th>
@@ -20,7 +20,7 @@ export const OutputComponent: Component<{ output: Output[] }> = (props) => {
         <tbody>
           <For each={props.output}>
             {(operation) => (
-              <tr>
+              <tr class={operation.isCritical ? 'text-red-700' : ''}>
                 <td>{operation.activity}</td>
                 <td>{operation.duration}</td>
                 <td>{operation.ES}</td>
@@ -28,7 +28,7 @@ export const OutputComponent: Component<{ output: Output[] }> = (props) => {
                 <td>{operation.LS}</td>
                 <td>{operation.LF}</td>
                 <td>{operation.reserve}</td>
-                <td>{operation.isCritical}</td>
+                <td>{operation.isCritical ? 'tak' : 'nie'}</td>
               </tr>
             )}
           </For>
