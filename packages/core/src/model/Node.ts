@@ -1,5 +1,6 @@
 export interface Node{
     num: number,
-    next: Node[]
+    previous: {num: number, activity: string, duration: number}[]
+    next: {num: number, activity: string, duration: number}[]
 }
 
