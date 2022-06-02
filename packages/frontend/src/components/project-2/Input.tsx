@@ -1,4 +1,4 @@
-import { Component, For } from "solid-js";
+import { Component, createSignal, For } from "solid-js";
 
 import {
   Client,
@@ -7,93 +7,129 @@ import {
 } from "../../../../core/src/model/Transportation";
 
 export const InputComponent: Component<{
-  setActivities: any;
-  activities: any;
+  clients: any;
+  setClients: any;
+  suppliers: any;
+  setSuppliers: any;
+  routes: any;
+  setRoutes: any;
 }> = (props) => {
-  const clients: Client[] = [
-    {
-      index: 0,
-      demand: 10,
-      price: 30,
-    },
-    {
-      index: 1,
-      demand: 28,
-      price: 25,
-    },
-    {
-      index: 2,
-      demand: 27,
-      price: 30,
-    },
-  ];
-
-  const suppliers: Supplier[] = [
-    {
-      index: 0,
-      supply: 20,
-      cost: 10,
-    },
-    {
-      index: 1,
-      supply: 30,
-      cost: 12,
-    },
-  ];
-
-  const routes: Route[][] = [
-    [
-      {
-        client: 0,
-        supplier: 0,
-        cost: 8,
-      },
-      {
-        client: 1,
-        supplier: 0,
-        cost: 14,
-      },
-      {
-        client: 2,
-        supplier: 0,
-        cost: 17,
-      },
-    ],
-    [
-      {
-        client: 0,
-        supplier: 1,
-        cost: 12,
-      },
-      {
-        client: 1,
-        supplier: 1,
-        cost: 9,
-      },
-      {
-        client: 2,
-        supplier: 1,
-        cost: 19,
-      },
-    ],
-  ];
-
   const handleClick = () => {
-    const amountClients = document.getElementById("amount-clients")?.value;
+    const amountClients = +document.getElementById("amount-clients")?.value;
     const amountSuppliers = document.getElementById("amount-suppliers")?.value;
 
-    console.log(amountClients);
-    console.log(amountSuppliers);
+    const tmpClients: Client[] = [];
 
-    (document.getElementById("amount-clients") as HTMLInputElement).value = "";
-    (document.getElementById("amount-suppliers") as HTMLInputElement).value =
-      "";
+    for (let i = 0; i < amountClients; i++) {
+      tmpClients.push({
+        index: i,
+        demand: 0,
+        price: 0,
+      });
+    }
+
+    const tmpSuppliers: Supplier[] = [];
+
+    for (let i = 0; i < amountSuppliers; i++) {
+      tmpSuppliers.push({
+        index: i,
+        supply: 0,
+        cost: 0,
+      });
+    }
+
+    const tmpRoutes: Route[] = [];
+
+    for (let i = 0; i < amountSuppliers; i++) {
+      for (let ii = 0; ii < amountClients; ii++) {
+        tmpRoutes.push({
+          client: ii,
+          supplier: i,
+          cost: 0
+        })
+
+      }
+    }
+    props.setRoutes(tmpRoutes)
+    props.setClients(tmpClients);
+    props.setSuppliers(tmpSuppliers);
+
   };
 
-  const handleDelete = (activity: string) => {
-    const filtered = props.activities().filter((a) => a.activity !== activity);
+  const updateDemand = (event: Event, clientIndex: number) => {
+    props.setClients(
+      props.clients().map((client: Client) => {
+        if (client.index === clientIndex) {
+          return {
+            ...client,
+            demand: event.target ? +event.target.value : -1,
+          };
+        }
+        return client;
+      })
+    );
+  };
 
-    props.setActivities(filtered);
+  const updatePrice = (event: Event, clientIndex: number) => {
+    props.setClients(
+      props.clients().map((client: Client) => {
+        if (client.index === clientIndex) {
+          return {
+            ...client,
+            price: event.target ? +event.target.value : -1,
+          };
+        }
+        return client;
+      })
+    );
+  };
+
+  const updateCost = (event: Event, supplierIndex: number) => {
+    props.setSuppliers(
+      props.suppliers().map((supplier: Supplier) => {
+        if (supplier.index === supplierIndex) {
+          return {
+            ...supplier,
+            cost: event.target ? +event.target.value : -1,
+          };
+        }
+        return supplier;
+      })
+    );
+  };
+
+  const updateSupply = (event: Event, supplierIndex: number) => {
+    props.setSuppliers(
+      props.suppliers().map((supplier: Supplier) => {
+        if (supplier.index === supplierIndex) {
+          return {
+            ...supplier,
+            supply: event.target ? +event.target.value : -1,
+          };
+        }
+        return supplier;
+      })
+    );
+  };
+
+  const updateRoute = (
+    event: Event,
+    clientIndex: number,
+    supplierIndex: number
+  ) => {
+    const routeIndex = supplierIndex * props.clients().length + clientIndex;
+
+    props.setRoutes(
+      props.routes().map((route: Route, index: number) => {
+        if (routeIndex === index) {
+          return {
+            ...route,
+            cost: event.target ? +event.target.value : -1,
+          };
+        }
+        return route;
+      })
+    );
   };
 
   return (
@@ -104,39 +140,35 @@ export const InputComponent: Component<{
         <div>Ilość dostawców</div>
       </div>
       <div class="grid grid-cols-2 grid-flow-col gap-4 w-80">
-        <input
-          type="number"
-          class="border border-sky-500"
-          id="amount-clients"
-        ></input>
-        <input
-          type="number"
-          class="border border-sky-500"
-          id="amount-suppliers"
-        ></input>
+        <input type="number" class="border " id="amount-clients"></input>
+        <input type="number" class="border " id="amount-suppliers"></input>
       </div>
       <div>
         <button
           class="rounded-full bg-green-500/75 p-1 mt-3"
           onClick={handleClick}
         >
-          DODAJ
+          Generuj
         </button>
       </div>
       <div>
         <table class="border-collapse border border-slate-500 mt-10">
           <thead>
             <tr class="h-24 text-center">
-              <td class="border-collapse border border-slate-500 w-24">
-              </td>
+              <td class="border-collapse border border-slate-500 w-24"></td>
               <td class="border-collapse border border-slate-500 w-24">
                 Popyt
               </td>
-              
-              <For each={clients}>
-                {(client) => (
+
+              <For each={props.clients()}>
+                {(client: Client) => (
                   <td class="border-collapse border border-slate-500 w-24">
-                    {client.demand}
+                    <input
+                      type="number"
+                      class="border w-12 h-12 text-center demand"
+                      value={client.demand}
+                      onChange={(e) => updateDemand(e, client.index)}
+                    ></input>
                   </td>
                 )}
               </For>
@@ -145,42 +177,89 @@ export const InputComponent: Component<{
               <td class="border-collapse border border-slate-500 w-24">
                 Podaż
               </td>
-              <td class="border-collapse border border-slate-500 w-24">
-                
-              </td>
-              
-              <For each={clients}>
-                {(client) => (
+              <td class="border-collapse border border-slate-500 w-24"></td>
+
+              <For each={props.clients()}>
+                {(client: Client) => (
                   <td class="border-collapse border border-slate-500 w-24">
-                    Klient {client.index}
+                    Klient {client.index + 1}
                   </td>
                 )}
               </For>
+              <td class="border-collapse border border-slate-500 w-24">
+                Cena zakupu
+              </td>
             </tr>
           </thead>
           <tbody>
-            <For each={suppliers}>
-              {(supplier) => (
+            <For each={props.suppliers()}>
+              {(supplier: Supplier) => (
                 <>
                   <tr class="h-24 text-center">
                     <td class="border-collapse border border-slate-500">
-                      {supplier.supply}
+                      <input
+                        type="number"
+                        class="border w-12 h-12 text-center supply"
+                        value={supplier.supply}
+                        onChange={(e) => updateSupply(e, supplier.index)}
+                      ></input>
                     </td>
                     <td class="border-collapse border border-slate-500">
-                      Dostawca {supplier.index}
+                      Dostawca {supplier.index + 1}
                     </td>
-                    
-                    <For each={clients}>
-                      {(client) => (
-                        <td class="border-collapse border-2 border-slate-500">
-                          {routes[supplier.index][client.index].cost}
+
+                    <For each={props.clients()}>
+                      {(client: Client) => (
+                        <td class="border-collapse border-4 border-slate-500">
+                          <input
+                            type="number"
+                            class="border w-12 h-12 text-center transport-cost"
+                            value={
+                              props.routes()[
+                                supplier.index * props.clients().length +
+                                  client.index
+                              ]?.cost
+                            }
+                            onChange={(e) =>
+                              updateRoute(e, client.index, supplier.index)
+                            }
+                          ></input>
                         </td>
                       )}
                     </For>
+
+                    <td class="border-collapse border border-slate-500">
+                      <input
+                        type="number"
+                        class="border w-12 h-12 text-center cost"
+                        value={supplier.cost}
+                        onChange={(e) => updateCost(e, supplier.index)}
+                      ></input>
+                    </td>
                   </tr>
                 </>
               )}
             </For>
+            <tr class="h-24 text-center">
+              <td class="border-collapse border border-slate-500"></td>
+              <td class="border-collapse border border-slate-500">
+                Cena sprzedaży
+              </td>
+              <For each={props.clients()}>
+                {(client: Client) => (
+                  <td class="border-collapse border border-slate-500">
+                    <input
+                      type="number"
+                      class="border w-12 h-12 text-center price"
+                      value={client.price}
+                      onChange={(e) => updatePrice(e, client.index)}
+                    ></input>
+                  </td>
+                )}
+              </For>
+
+              <td class="border-collapse border border-slate-500"></td>
+            </tr>
           </tbody>
         </table>
       </div>

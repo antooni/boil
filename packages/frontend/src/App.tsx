@@ -2,64 +2,96 @@ import { createSignal } from "solid-js";
 import { InputComponent } from "./components/project-2/Input";
 import { OutputComponent } from "./components/project-2/Output";
 
+import {calculateResult} from "../../core/src/services/Intermediary"
+import {Transport} from "../../core/src/model/Transportation";
+
 // PROJECT 1
 // import { CPM } from "../../core/src/services/CPM";
 // import { InputComponent } from "./components/project-1/Input";
 // import { OutputComponent } from "./components/project-1/Output";
 
-
-
 function App() {
-  const [input, setInput] = createSignal([
+
+  const [clients, setClients] = createSignal([
     {
-      activity: "A",
-      previous: [],
-      duration: 5,
+      index: 0,
+      demand: 10,
+      price: 30,
     },
     {
-      activity: "B",
-      previous: [],
-      duration: 7,
+      index: 1,
+      demand: 28,
+      price: 25,
     },
     {
-      activity: "C",
-      previous: ["A"],
-      duration: 6,
-    },
-    {
-      activity: "D",
-      previous: ["A"],
-      duration: 8,
-    },
-    {
-      activity: "E",
-      previous: ["B"],
-      duration: 3,
-    },
-    {
-      activity: "F",
-      previous: ["C"],
-      duration: 4,
-    },
-    {
-      activity: "G",
-      previous: ["C"],
-      duration: 2,
-    },
-    {
-      activity: "H",
-      previous: ["D", "E", "F"],
-      duration: 5,
+      index: 2,
+      demand: 27,
+      price: 30,
     },
   ]);
+
+  const [suppliers, setSuppliers] = createSignal([
+    {
+      index: 0,
+      supply: 20,
+      cost: 10,
+    },
+    {
+      index: 1,
+      supply: 30,
+      cost: 12,
+    },
+  ]);
+
+  const [routes, setRoutes] = createSignal([
+    {
+      client: 0,
+      supplier: 0,
+      cost: 8,
+    },
+    {
+      client: 1,
+      supplier: 0,
+      cost: 14,
+    },
+    {
+      client: 2,
+      supplier: 0,
+      cost: 17,
+    },
+    {
+      client: 0,
+      supplier: 1,
+      cost: 12,
+    },
+    {
+      client: 1,
+      supplier: 1,
+      cost: 9,
+    },
+    {
+      client: 2,
+      supplier: 1,
+      cost: 19,
+    },
+  ]);
+
   const [output, setOutput] = createSignal([]);
 
+  const [profit, setProfit] = createSignal(0);
+
   const calculateOutput = () => {
-    const cpm = new CPM();
+    const result: Transport[] = calculateResult(suppliers(),clients(),routes())
 
-    const result = cpm.solve(input());
+    setOutput(result)
 
-    setOutput(result);
+    let p = 0
+
+    for(const r of result) {
+      p += r.amount * r.pricePerOne
+    }
+
+    setProfit(p)
   };
 
   // PROJECT 1
@@ -88,10 +120,20 @@ function App() {
       </div>
       <div class="p-8 flex flex-row">
         <InputComponent
-          setActivities={setInput}
-          activities={input}
+          clients={clients}
+          setClients={setClients}
+          suppliers={suppliers}
+          setSuppliers={setSuppliers}
+          routes={routes}
+          setRoutes={setRoutes}
         ></InputComponent>
-        <OutputComponent output={output()}></OutputComponent>
+
+        <OutputComponent 
+          clients={clients}
+          suppliers={suppliers}
+          output={output}
+          profit={profit}
+        ></OutputComponent>
       </div>
     </>
   );

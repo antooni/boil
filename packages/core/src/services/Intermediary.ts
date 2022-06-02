@@ -6,6 +6,16 @@ import {
   Transport,
 } from "../model/Transportation";
 
+export function calculateResult(suppliers: Supplier[],
+  clients: Client[],
+  routes: Route[]): Transport[] {
+  const profits = calculateCosts(suppliers,clients,routes)
+
+  const result = findMax(clients,suppliers,profits)
+
+  return result
+}
+
 export function calculateCosts(
   suppliers: Supplier[],
   clients: Client[],
