@@ -45,8 +45,6 @@ export function findMax(
 ): Transport[] {
   const transports = [];
 
-  let ctr = 0;
-
   for (const [index, profit] of profits.entries()) {
     transports.push({
       client: profit.client,
@@ -82,11 +80,22 @@ export function findMax(
     suppliers[profits[maxIndex].supplier].supply -= diff;
 
     transports[maxIndex].amount = diff;
-
+    
     console.log(diff);
-    ctr++;
+    let ctr1 = 0;
+    let ctr2 = 0;
+    for (let i = 0; i < 3; i++){
+      if(clients[profits[i].client].demand!==0){
+        ctr1++;
+      }
+    }
+    for (let i = 0; i < 2; i++){
+      if(suppliers[profits[i].supplier].supply!==0){
+        ctr2++;
+      }
+    }
 
-    if (ctr > 3) break;
+    if (ctr1 === 0 || ctr2 === 0 ) break;
   }
 
   return transports;
