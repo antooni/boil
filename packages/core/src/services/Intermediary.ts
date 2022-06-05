@@ -85,14 +85,10 @@ export function findMax(
     let ctr1 = 0;
     let ctr2 = 0;
     for (let i = 0; i < 3; i++){
-      if(clients[profits[i].client].demand!==0){
-        ctr1++;
-      }
+      ctr1+=clients[profits[i].client].demand;
     }
     for (let i = 0; i < 2; i++){
-      if(suppliers[profits[i].supplier].supply!==0){
-        ctr2++;
-      }
+      ctr2+=suppliers[profits[i].supplier].supply;
     }
 
     if (ctr1 === 0 || ctr2 === 0 ) break;
